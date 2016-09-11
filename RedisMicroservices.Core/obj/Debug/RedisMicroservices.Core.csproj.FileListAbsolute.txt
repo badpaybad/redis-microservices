@@ -1,0 +1,9 @@
+D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Core.dll
+D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Core.pdb
+D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\Newtonsoft.Json.dll
+D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis.dll
+D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\Newtonsoft.Json.xml
+D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis.pdb
+D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis.xml
+D:\work\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.dll
+D:\work\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.pdb
