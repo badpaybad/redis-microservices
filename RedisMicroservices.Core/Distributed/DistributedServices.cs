@@ -57,6 +57,7 @@ namespace RedisMicroservices.Core.Distributed
                         break;
                     case CommandBehavior.PubSub:
                         callBack(redisChannel, cmd);
+                        isDone = true;
                         break;
                 }
                 if (isDone)
@@ -115,6 +116,7 @@ namespace RedisMicroservices.Core.Distributed
                         break;
                     case CommandBehavior.PubSub:
                         callBack(redisChannel, cmd);
+                        isDone = true;
                         break;
                 }
                 if (isDone)
@@ -173,6 +175,7 @@ namespace RedisMicroservices.Core.Distributed
                         break;
                     case CommandBehavior.PubSub:
                         callBack(redisChannel, cmd);
+                        isDone = true;
                         break;
                 }
                 if (isDone)
