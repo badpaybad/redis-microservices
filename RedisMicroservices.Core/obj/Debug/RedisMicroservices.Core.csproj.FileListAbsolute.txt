@@ -7,3 +7,12 @@ D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis
 D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis.xml
 D:\work\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.dll
 D:\work\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.pdb
+D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Core.dll
+D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Core.pdb
+D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\Newtonsoft.Json.dll
+D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis.dll
+D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\Newtonsoft.Json.xml
+D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis.pdb
+D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis.xml
+D:\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.dll
+D:\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.pdb

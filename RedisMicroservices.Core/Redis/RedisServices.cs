@@ -38,7 +38,7 @@ namespace RedisMicroservices.Core.Redis
 
         static RedisServices()
         {
-            _socketManager = new SocketManager("JulJulCore", true);
+            _socketManager = new SocketManager("JulJulCore");
         }
 
         public static ConnectionMultiplexer GetConnection()

@@ -10,3 +10,15 @@ D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\Newtonsoft.Js
 D:\work\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices.Repository.pdb
 D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Repository.exe
 D:\work\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices.Repository.exe
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Repository.exe
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Repository.pdb
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Core.dll
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\StackExchange.Redis.dll
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\Newtonsoft.Json.dll
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Core.pdb
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\StackExchange.Redis.pdb
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\StackExchange.Redis.xml
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\Newtonsoft.Json.xml
+D:\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices.Repository.csprojResolveAssemblyReference.cache
+D:\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices.Repository.exe
+D:\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices.Repository.pdb
