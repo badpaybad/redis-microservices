@@ -64,7 +64,10 @@ namespace RedisMicroservices.Core.Distributed
                             break;
                     }
                     if (isDone)
+                    {
+                        LogSuccess<T>(value);
                         Console.WriteLine("Done:" + value);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -74,10 +77,6 @@ namespace RedisMicroservices.Core.Distributed
             });
         }
 
-        void LogError<T>(RedisValue val)
-        {
-            RedisServices.RedisDatabase.HashSet("juljul_command_log", typeof(T).FullName, val);
-        }
 
         public void PublishEntity<T>(DistributedCommandEntity<T> cmd) where T : class, IEntity
         {
@@ -135,7 +134,10 @@ namespace RedisMicroservices.Core.Distributed
                             break;
                     }
                     if (isDone)
+                    {
+                        LogSuccess<T>(value);
                         Console.WriteLine("Done:" + value);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -198,12 +200,16 @@ namespace RedisMicroservices.Core.Distributed
                             }
                             break;
                         case CommandBehavior.PubSub:
+                            //how to log success for all subcribers
                             callBack(redisChannel, cmd);
                             isDone = true;
                             break;
                     }
                     if (isDone)
+                    {
+                        LogSuccess<T>(value);
                         Console.WriteLine("Done:" + value);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -211,6 +217,17 @@ namespace RedisMicroservices.Core.Distributed
                     Console.WriteLine(ex);
                 }
             });
+        }
+
+
+        void LogError<T>(RedisValue val)
+        {
+            RedisServices.RedisDatabase.HashSet("juljul_command_log_error", typeof(T).FullName, val);
+        }
+
+        void LogSuccess<T>(RedisValue val)
+        {
+            RedisServices.RedisDatabase.HashSet("juljul_command_log_sucess", typeof(T).FullName, val);
         }
     }
 }
