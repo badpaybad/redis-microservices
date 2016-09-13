@@ -25,6 +25,8 @@ namespace RedisMicroservices.Core.Distributed
 
             RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
 
+            LogCommand(cmd);
+
             Console.WriteLine("Pushed:" + redisValue);
         }
 
@@ -94,7 +96,7 @@ namespace RedisMicroservices.Core.Distributed
             }
 
             RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
-
+            LogCommand(cmd);
             Console.WriteLine("Pushed:" + redisValue);
         }
 
@@ -164,7 +166,7 @@ namespace RedisMicroservices.Core.Distributed
             }
 
             RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
-
+            LogCommand(cmd);
             Console.WriteLine("Pushed:" + redisValue);
         }
 
@@ -219,6 +221,10 @@ namespace RedisMicroservices.Core.Distributed
             });
         }
 
+        void LogCommand<T>(DistributedCommand<T> cmd) where T : class
+        {
+            RedisServices.RedisDatabase.ListRightPush("juljul_command_log_pushed",  cmd.ToJson());
+        }
 
         void LogError<T>(RedisValue val)
         {
