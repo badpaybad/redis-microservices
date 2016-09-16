@@ -7,6 +7,5 @@ namespace RedisMicroservices.Core.Repository
   {
       void RegisterDistributed(IDistributedServices distributedServices);
 
-      List<T> SelectAll();
   }
 }

@@ -5,16 +5,16 @@ namespace RedisMicroservices.Core.Distributed
 {
     public class DistributedCommand<T> where T : class 
     {
-        public CommandBehavior CommandBehavior { get; set; }
+        public DataBehavior DataBehavior { get; set; }
 
         public T Data { get; set; }
 
         public Type DataType { get { return Data.GetType(); } }
 
-        public DistributedCommand(T data,  CommandBehavior commandBehavior = CommandBehavior.Queue)
+        public DistributedCommand(T data,  DataBehavior dataBehavior = DataBehavior.Queue)
         {
             Data = data;
-            CommandBehavior = commandBehavior;
+            DataBehavior = dataBehavior;
         }
 
         public string ToJson()

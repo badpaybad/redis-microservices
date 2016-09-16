@@ -1,6 +1,6 @@
 ﻿namespace RedisMicroservices.Core.Distributed
 {
-    public enum CommandBehavior
+    public enum DataBehavior
     {
         Queue,
         PubSub,

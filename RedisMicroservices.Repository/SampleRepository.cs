@@ -9,7 +9,7 @@ namespace RedisMicroservices.Repository
 {
     public class SampleRepository : IRepository<Sample>,ISampleRepository
     {
-        
+           
         void Insert(Sample entity)
         {
             //using eneity framework to insert into db
@@ -35,10 +35,6 @@ namespace RedisMicroservices.Repository
             });
         }
 
-        public List<Sample> SelectAll()
-        {
-            //   //using eneity framework to insert into db
-            return SampleMockStorage.All();
-        }
+        
     }
 }
