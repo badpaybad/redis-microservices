@@ -29,3 +29,5 @@ D:\RedisMicroservices\RedisMicroservices.TestForm\bin\Debug\StackExchange.Redis.
 D:\RedisMicroservices\RedisMicroservices.TestForm\bin\Debug\Newtonsoft.Json.xml
 D:\RedisMicroservices\RedisMicroservices.TestForm\obj\Debug\RedisMicroservices.TestForm.exe
 D:\RedisMicroservices\RedisMicroservices.TestForm\obj\Debug\RedisMicroservices.TestForm.pdb
+D:\work\RedisMicroservices\RedisMicroservices.TestForm\bin\Debug\RedisMicroservices.Domain.dll
+D:\work\RedisMicroservices\RedisMicroservices.TestForm\bin\Debug\RedisMicroservices.Domain.pdb

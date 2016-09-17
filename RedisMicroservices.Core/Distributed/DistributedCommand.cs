@@ -5,7 +5,7 @@ namespace RedisMicroservices.Core.Distributed
 {
     public class DistributedCommand<T> where T : class
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
         public DataBehavior DataBehavior { get; set; }
 
         public T Data { get; set; }

@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using RedisMicroservices.Core.Distributed;
-using RedisMicroservices.Core.Domain;
 using RedisMicroservices.Core.Repository;
+using RedisMicroservices.Domain;
 
 namespace RedisMicroservices.Services
 {
@@ -46,7 +46,7 @@ namespace RedisMicroservices.Services
             Thread.Sleep(1000); //sleep to simulate something to do 
             //after all push to message queue using distributed services
 
-            //call  to store by repository
+            //push command to store by repository engine
             _distributedServices.PublishEntity(new DistributedCommandEntity<Sample>(new Sample()
             {
                 Id = data.Id,

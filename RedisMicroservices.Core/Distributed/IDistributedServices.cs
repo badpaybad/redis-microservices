@@ -1,5 +1,6 @@
 ﻿using System;
 using RedisMicroservices.Core.Repository;
+using RedisMicroservices.Domain;
 
 namespace RedisMicroservices.Core.Distributed
 {

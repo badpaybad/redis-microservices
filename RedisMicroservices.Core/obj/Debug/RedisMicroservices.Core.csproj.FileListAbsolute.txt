@@ -16,3 +16,5 @@ D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis.xml
 D:\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.dll
 D:\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.pdb
 D:\work\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.csprojResolveAssemblyReference.cache
+D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Domain.dll
+D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Domain.pdb

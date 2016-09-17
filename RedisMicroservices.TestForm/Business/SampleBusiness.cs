@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RedisMicroservices.Core.Domain;
-using RedisMicroservices.Core.Domain.StorageMock;
+using RedisMicroservices.Domain;
+using RedisMicroservices.Domain.StorageMock;
 
 namespace RedisMicroservices.TestForm.Business
 {

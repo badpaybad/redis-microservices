@@ -54,21 +54,23 @@
     <Compile Include="Distributed\DistributedEntityCommand.cs" />
     <Compile Include="Distributed\DataBehavior.cs" />
     <Compile Include="Distributed\DistributedServices.cs" />
-    <Compile Include="Domain\LanguageData.cs" />
-    <Compile Include="Domain\Sample.cs" />
-    <Compile Include="Domain\SampleData.cs" />
-    <Compile Include="Domain\StorageMock\SampleMockStorage.cs" />
-    <Compile Include="Repository\EntityAction.cs" />
     <Compile Include="Distributed\IDistributedServices.cs" />
-    <Compile Include="Repository\IEntity.cs" />
-    <Compile Include="Services\IDataModel.cs" />
-    <Compile Include="Repository\IRepository.cs" />
-    <Compile Include="Services\IDataModelServices.cs" />
+    <Compile Include="Repository\IRepositoryEngine.cs" />
+    <Compile Include="Services\IServicesEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Redis\RedisServices.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Distributed\architect design.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RedisMicroservices.Domain\RedisMicroservices.Domain.csproj">
+      <Project>{cf0f6609-321d-4dae-b8eb-c1af518dcee2}</Project>
+      <Name>RedisMicroservices.Domain</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

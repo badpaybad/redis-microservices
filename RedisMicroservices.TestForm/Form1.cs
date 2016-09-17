@@ -8,8 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RedisMicroservices.Core.Distributed;
-using RedisMicroservices.Core.Domain;
-using RedisMicroservices.Core.Repository;
+using RedisMicroservices.Domain;
 using RedisMicroservices.TestForm.Business;
 
 namespace RedisMicroservices.TestForm

@@ -1,6 +1,6 @@
 using System.Threading;
 using RedisMicroservices.Core.Distributed;
-using RedisMicroservices.Core.Domain;
+using RedisMicroservices.Domain;
 
 namespace RedisMicroservices.Services
 {

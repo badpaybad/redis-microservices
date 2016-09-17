@@ -1,9 +1,9 @@
-using RedisMicroservices.Core.Domain;
 using RedisMicroservices.Core.Repository;
+using RedisMicroservices.Domain;
 
 namespace RedisMicroservices.Repository
 {
-    public interface ISampleRepository:IRepository<Sample>
+    public interface ISampleRepository:IRepositoryEngine<Sample>
     {
         
     }

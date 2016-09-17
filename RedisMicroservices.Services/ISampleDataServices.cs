@@ -1,7 +1,10 @@
-using RedisMicroservices.Core.Domain;
 using RedisMicroservices.Core.Services;
+using RedisMicroservices.Domain;
 
 namespace RedisMicroservices.Services
 {
-    public interface ISampleDataServices: IDataModelServices<SampleData> { }
+    public interface ISampleDataServices : IServicesEngine<SampleData>
+    {
+        void DoSomething(SampleData data);
+    }
 }

@@ -2,6 +2,7 @@ using System;
 using Newtonsoft.Json;
 using RedisMicroservices.Core.Redis;
 using RedisMicroservices.Core.Repository;
+using RedisMicroservices.Domain;
 using StackExchange.Redis;
 
 namespace RedisMicroservices.Core.Distributed

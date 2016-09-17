@@ -84,6 +84,10 @@
       <Project>{f5f33106-f5db-44b4-a7ed-304f70845e26}</Project>
       <Name>RedisMicroservices.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RedisMicroservices.Domain\RedisMicroservices.Domain.csproj">
+      <Project>{cf0f6609-321d-4dae-b8eb-c1af518dcee2}</Project>
+      <Name>RedisMicroservices.Domain</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
