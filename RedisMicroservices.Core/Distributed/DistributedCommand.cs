@@ -3,16 +3,21 @@ using Newtonsoft.Json;
 
 namespace RedisMicroservices.Core.Distributed
 {
-    public class DistributedCommand<T> where T : class 
+    public class DistributedCommand<T> where T : class
     {
+        public Guid Id { get; set; }
         public DataBehavior DataBehavior { get; set; }
 
         public T Data { get; set; }
 
-        public Type DataType { get { return Data.GetType(); } }
-
-        public DistributedCommand(T data,  DataBehavior dataBehavior = DataBehavior.Queue)
+        public Type DataType
         {
+            get { return Data.GetType(); }
+        }
+
+        public DistributedCommand(T data, DataBehavior dataBehavior = DataBehavior.Queue)
+        {
+            Id = Guid.NewGuid();
             Data = data;
             DataBehavior = dataBehavior;
         }
