@@ -23,3 +23,10 @@ D:\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices
 D:\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices.Repository.pdb
 D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Domain.dll
 D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Domain.pdb
+D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Repository.exe.config
+D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\EntityFramework.dll
+D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\EntityFramework.SqlServer.dll
+D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.DataAccess.dll
+D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.DataAccess.pdb
+D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\EntityFramework.xml
+D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\EntityFramework.SqlServer.xml

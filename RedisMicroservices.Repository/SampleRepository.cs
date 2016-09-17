@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using RedisMicroservices.Core.Distributed;
 using RedisMicroservices.Core.Repository;
 using RedisMicroservices.Domain;
-using RedisMicroservices.Domain.StorageMock;
+using RedisMicroservices.Domain.Ef6;
 
 namespace RedisMicroservices.Repository
 {
@@ -15,7 +15,11 @@ namespace RedisMicroservices.Repository
        public void Insert(Sample entity)
         {
             //using eneity framework to insert into db
-            SampleMockStorage.Add(entity);
+           using (var db=new SampleDbContext())
+           {
+               db.Samples.Add(entity);
+               db.SaveChanges();
+           }
         }
 
         public void Update(Sample entity)

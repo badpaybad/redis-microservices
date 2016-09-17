@@ -1,0 +1,51 @@
+﻿@model List<RedisMicroservices.Domain.Sample>
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<fieldset >
+    <legend>List all sample</legend>
+
+    <div class="row">
+        <div class="col-xs-4">Id</div>
+        <div class="col-xs-4">Version</div>
+        <div class="col-xs-4">Name</div>
+    </div>
+    @foreach (var m in Model)
+    {
+        <div class="row">
+            <div class="col-xs-4">@m.Id</div>
+            <div class="col-xs-4">@m.Name</div>
+            <div class="col-xs-4">@m.Version</div>
+        </div>
+    }
+
+</fieldset>
+<fieldset>
+    <legend>Create random</legend>
+
+    @using (Html.BeginForm("CreateRandom", "Home"))
+    {
+        var rnd = new Random();
+        <div class="row">
+            <div class="col-xs-3">Id</div>
+            <div class="col-xs-9">@Html.TextBox("Id", Guid.NewGuid())</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">Name</div>
+            <div class="col-xs-9">@Html.TextBox("Name", "Name " + rnd.Next())</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">Version</div>
+            <div class="col-xs-9">@Html.TextBox("Version", "Version " + rnd.Next())</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">LanguageCode</div>
+            <div class="col-xs-9">@Html.TextBox("LanguageCode", "Vn")</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3"></div>
+            <div class="col-xs-9"><input type="submit" value="Submit" /></div>
+        </div>
+    }
+</fieldset>

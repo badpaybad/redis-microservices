@@ -50,7 +50,8 @@ namespace RedisMicroservices.Services
             _distributedServices.PublishEntity(new DistributedCommandEntity<Sample>(new Sample()
             {
                 Id = data.Id,
-                Version = data.Version
+                Version = data.Version,
+                Name= data.Name
             }, EntityAction.Insert));
         }
 
