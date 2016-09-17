@@ -25,7 +25,7 @@ namespace RedisMicroservices.Core.Distributed
 
             RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
 
-            LogCommand(cmd);
+            LogCommand<T>(redisValue);
 
             Console.WriteLine("Pushed:" + redisValue);
         }
@@ -96,7 +96,7 @@ namespace RedisMicroservices.Core.Distributed
             }
 
             RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
-            LogCommand(cmd);
+            LogCommand<T>(redisValue);
             Console.WriteLine("Pushed:" + redisValue);
         }
 
@@ -166,7 +166,7 @@ namespace RedisMicroservices.Core.Distributed
             }
 
             RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
-            LogCommand(cmd);
+            LogCommand<T>(redisValue);
             Console.WriteLine("Pushed:" + redisValue);
         }
 
@@ -221,19 +221,19 @@ namespace RedisMicroservices.Core.Distributed
             });
         }
 
-        void LogCommand<T>(DistributedCommand<T> cmd) where T : class
+        void LogCommand<T>(RedisValue cmdJson) where T : class
         {
-            RedisServices.RedisDatabase.ListRightPush("juljul_command_log_pushed",  cmd.ToJson());
+            RedisServices.RedisDatabase.ListRightPush("juljul_command_log_pushed",  cmdJson,When.Always,CommandFlags.FireAndForget);
         }
 
-        void LogError<T>(RedisValue val)
+        void LogError<T>(RedisValue cmdJson) where T : class
         {
-            RedisServices.RedisDatabase.HashSet("juljul_command_log_error", typeof(T).FullName, val);
+            RedisServices.RedisDatabase.ListRightPush("juljul_command_log_error",  cmdJson, When.Always, CommandFlags.FireAndForget);
         }
 
-        void LogSuccess<T>(RedisValue val)
+        void LogSuccess<T>(RedisValue cmdJson) where T : class
         {
-            RedisServices.RedisDatabase.HashSet("juljul_command_log_sucess", typeof(T).FullName, val);
+            RedisServices.RedisDatabase.ListRightPush("juljul_command_log_sucess", cmdJson, When.Always, CommandFlags.FireAndForget);
         }
     }
 }
