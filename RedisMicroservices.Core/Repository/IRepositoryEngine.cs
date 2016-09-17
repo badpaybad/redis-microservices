@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using RedisMicroservices.Core.Distributed;
 using RedisMicroservices.Domain;
+using RedisMicroservices.Domain.Entity;
 
 namespace RedisMicroservices.Core.Repository
 {

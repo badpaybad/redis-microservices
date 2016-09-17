@@ -5,7 +5,9 @@ using System.Web;
 using System.Web.Mvc;
 using RedisMicroservices.Core.Distributed;
 using RedisMicroservices.Domain;
+using RedisMicroservices.Domain.DataModel;
 using RedisMicroservices.Domain.Ef6;
+using RedisMicroservices.Domain.Entity;
 
 namespace RedisMicroservices.SampleWeb.Controllers
 {

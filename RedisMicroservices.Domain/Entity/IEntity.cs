@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RedisMicroservices.Domain
+namespace RedisMicroservices.Domain.Entity
 {
    public interface IEntity
     {

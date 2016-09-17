@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RedisMicroservices.Domain
+namespace RedisMicroservices.Domain.Entity
 {
     [Table("Sample")]
     public class Sample : IEntity

@@ -3,6 +3,8 @@ using System.Threading;
 using RedisMicroservices.Core.Distributed;
 using RedisMicroservices.Core.Repository;
 using RedisMicroservices.Domain;
+using RedisMicroservices.Domain.DataModel;
+using RedisMicroservices.Domain.Entity;
 
 namespace RedisMicroservices.Services
 {

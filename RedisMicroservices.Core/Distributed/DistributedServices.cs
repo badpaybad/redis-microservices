@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 using RedisMicroservices.Core.Redis;
 using RedisMicroservices.Core.Repository;
 using RedisMicroservices.Domain;
+using RedisMicroservices.Domain.DataModel;
+using RedisMicroservices.Domain.Entity;
 using StackExchange.Redis;
 
 namespace RedisMicroservices.Core.Distributed

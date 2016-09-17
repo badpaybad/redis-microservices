@@ -1,4 +1,4 @@
-﻿namespace RedisMicroservices.Domain
+﻿namespace RedisMicroservices.Domain.Entity
 {
     public enum EntityAction
     {

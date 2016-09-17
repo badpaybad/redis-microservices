@@ -6,6 +6,7 @@ using RedisMicroservices.Core.Distributed;
 using RedisMicroservices.Core.Repository;
 using RedisMicroservices.Domain;
 using RedisMicroservices.Domain.Ef6;
+using RedisMicroservices.Domain.Entity;
 
 namespace RedisMicroservices.Repository
 {

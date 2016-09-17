@@ -60,12 +60,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EntityAction.cs" />
-    <Compile Include="IDataModel.cs" />
-    <Compile Include="IEntity.cs" />
-    <Compile Include="LanguageData.cs" />
-    <Compile Include="Sample.cs" />
-    <Compile Include="SampleData.cs" />
+    <Compile Include="Entity\EntityAction.cs" />
+    <Compile Include="DataModel\IDataModel.cs" />
+    <Compile Include="Entity\IEntity.cs" />
+    <Compile Include="DataModel\LanguageData.cs" />
+    <Compile Include="Entity\Sample.cs" />
+    <Compile Include="DataModel\SampleData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

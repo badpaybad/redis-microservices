@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using RedisMicroservices.Domain.Entity;
 
 namespace RedisMicroservices.Domain.Ef6
 {
