@@ -19,15 +19,27 @@ namespace RedisMicroservices.Core.Distributed
         const string juljulCommandLogError = "juljul_command_log_error";
         const string juljulCommandLogSucess = "juljul_command_log_sucess";
         const string juljulChannelByDataType = "juljul_channel_log_by_data_type";
+        const string juljulLock = "juljul_lock";
 
         static DistributedServices()
         {
+            var lck = RedisServices.RedisDatabase.ListLeftPop(juljulLock);
+            if (!lck.HasValue)
+            {
+                RedisServices.RedisDatabase.ListLeftPush(juljulLock,true);
+            }
             _resendCmd = new Thread(() =>
             {
                 while (true)
                 {
                     try
                     {
+                        var lckok = RedisServices.RedisDatabase.ListLeftPop(juljulLock);
+                        if (!lckok.HasValue)
+                        {
+                            Thread.Sleep(1000);
+                           continue;
+                        }
                         var allCmdPushed =
                             RedisServices.RedisDatabase.HashGetAll(juljulCommandLogPushed).ToDictionary();
                         var allCmdSuccess =
@@ -64,15 +76,18 @@ namespace RedisMicroservices.Core.Distributed
                                     case DataBehavior.Stack:
                                         RedisServices.RedisDatabase.ListRightPush(cmd.DataBehavior + dataType,
                                             redisValue);
-
                                         break;
                                     case DataBehavior.PubSub:
+                                        RedisServices.RedisDatabase.HashSet(cmd.DataBehavior + dataType, cmd.Id.ToString(), redisValue);
+
                                         break;
                                 }
 
                                 RedisServices.RedisDatabase.Publish(dataType, redisValue);
                             }
                         }
+
+                        RedisServices.RedisDatabase.ListLeftPush(juljulLock, true);
                     }
                     catch (Exception ex)
                     {
@@ -84,10 +99,11 @@ namespace RedisMicroservices.Core.Distributed
                         {
                             Thread.Sleep(100);
                         }
-                    }
+
+                      }
                 }
             });
-            _resendCmd.Start();
+            // _resendCmd.Start();
         }
 
         public void Publish<T>(DistributedCommand<T> cmd) where T : class
@@ -99,9 +115,9 @@ namespace RedisMicroservices.Core.Distributed
                 case DataBehavior.Queue:
                 case DataBehavior.Stack:
                     RedisServices.RedisDatabase.ListRightPush(cmd.DataBehavior + redisChannel, redisValue);
-
                     break;
                 case DataBehavior.PubSub:
+                    RedisServices.RedisDatabase.HashSet(cmd.DataBehavior + redisChannel, cmd.Id.ToString(), redisValue);
                     break;
             }
 
@@ -144,8 +160,14 @@ namespace RedisMicroservices.Core.Distributed
                             }
                             break;
                         case DataBehavior.PubSub:
-                            callBack(redisChannel, cmd);
-                            isDone = true;
+                            var da = RedisServices.RedisDatabase.HashGet(cmd.DataBehavior + redisChannel,
+                                cmd.Id.ToString());
+                            if (da.HasValue)
+                            {
+                                var val = JsonConvert.DeserializeObject<DistributedCommand<T>>(da);
+                                callBack(redisChannel, val);
+                                isDone = true;
+                            }
                             break;
                     }
                     if (isDone)
@@ -175,6 +197,8 @@ namespace RedisMicroservices.Core.Distributed
 
                     break;
                 case DataBehavior.PubSub:
+                    RedisServices.RedisDatabase.HashSet(cmd.DataBehavior + redisChannel, cmd.Id.ToString(), redisValue);
+
                     break;
             }
             RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
@@ -213,8 +237,14 @@ namespace RedisMicroservices.Core.Distributed
                             }
                             break;
                         case DataBehavior.PubSub:
-                            callBack(redisChannel, cmd);
-                            isDone = true;
+                            var da = RedisServices.RedisDatabase.HashGet(cmd.DataBehavior + redisChannel,
+                               cmd.Id.ToString());
+                            if (da.HasValue)
+                            {
+                                var val = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(da);
+                                callBack(redisChannel, val);
+                                isDone = true;
+                            }
                             break;
                     }
                     if (isDone)
@@ -243,6 +273,8 @@ namespace RedisMicroservices.Core.Distributed
 
                     break;
                 case DataBehavior.PubSub:
+                    RedisServices.RedisDatabase.HashSet(cmd.DataBehavior + redisChannel, cmd.Id.ToString(), redisValue);
+
                     break;
             }
 
@@ -286,8 +318,14 @@ namespace RedisMicroservices.Core.Distributed
                             break;
                         case DataBehavior.PubSub:
                             //how to log success for all subcribers
-                            callBack(redisChannel, cmd);
-                            isDone = true;
+                            var da = RedisServices.RedisDatabase.HashGet(cmd.DataBehavior + redisChannel,
+                               cmd.Id.ToString());
+                            if (da.HasValue)
+                            {
+                                var val = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(da);
+                                callBack(redisChannel, val);
+                                isDone = true;
+                            }
                             break;
                     }
                     if (isDone)

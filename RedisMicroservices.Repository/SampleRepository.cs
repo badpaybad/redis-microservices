@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
 using RedisMicroservices.Core.Distributed;
@@ -18,6 +19,8 @@ namespace RedisMicroservices.Repository
             //using eneity framework to insert into db
            using (var db=new SampleDbContext())
            {
+              // if (db.Samples.Any(i => i.Id == entity.Id)) return;
+
                db.Samples.Add(entity);
                db.SaveChanges();
            }
