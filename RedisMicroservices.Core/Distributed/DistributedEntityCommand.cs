@@ -8,6 +8,8 @@ namespace RedisMicroservices.Core.Distributed
     {
         public EntityAction EntityAction { get; set; }
 
+        public DistributedCommandEntity() { } 
+
         public DistributedCommandEntity(T entity, EntityAction entityAction, DataBehavior dataBehavior = DataBehavior.Queue) : base(entity,dataBehavior)
         {
             EntityAction = entityAction;

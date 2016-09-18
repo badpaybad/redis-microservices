@@ -54,6 +54,7 @@
     <Compile Include="Distributed\DistributedEntityCommand.cs" />
     <Compile Include="Distributed\DataBehavior.cs" />
     <Compile Include="Distributed\DistributedServices.cs" />
+    <Compile Include="Distributed\BaseDistributedCommand.cs" />
     <Compile Include="Distributed\IDistributedServices.cs" />
     <Compile Include="Repository\IRepositoryEngine.cs" />
     <Compile Include="Services\IServicesEngine.cs" />

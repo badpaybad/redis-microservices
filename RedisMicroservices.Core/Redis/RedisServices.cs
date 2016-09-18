@@ -1,4 +1,5 @@
-﻿using StackExchange.Redis;
+﻿using System;
+using StackExchange.Redis;
 
 namespace RedisMicroservices.Core.Redis
 {
@@ -21,19 +22,29 @@ namespace RedisMicroservices.Core.Redis
                 }
 
                 _connectionMultiplexer = GetConnection();
-
+                if(!_connectionMultiplexer.IsConnected) throw new Exception("Can not connect to redis");
                 return _connectionMultiplexer;
             }
         }
 
         public static IDatabase RedisDatabase
         {
-            get { return RedisConnectionMultiplexer.GetDatabase(); }
+            get
+            {
+                var redisDatabase = RedisConnectionMultiplexer.GetDatabase();
+                
+                return redisDatabase;
+            }
         }
 
         public static ISubscriber RedisSubscriber
         {
-            get { return RedisConnectionMultiplexer.GetSubscriber(); }
+            get
+            {
+                var redisSubscriber = RedisConnectionMultiplexer.GetSubscriber();
+               
+                return redisSubscriber;
+            }
         }
 
         static RedisServices()
