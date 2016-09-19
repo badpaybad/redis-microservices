@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Distributed\CommandStatus.cs" />
     <Compile Include="Distributed\DistributedCommand.cs" />
     <Compile Include="Distributed\DistributedDataModelCommand.cs" />
     <Compile Include="Distributed\DistributedEntityCommand.cs" />
