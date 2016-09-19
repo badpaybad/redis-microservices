@@ -9,7 +9,6 @@ D:\work\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.
 D:\work\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.csprojResolveAssemblyReference.cache
 D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Domain.dll
 D:\work\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Domain.pdb
-D:\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.csprojResolveAssemblyReference.cache
 D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Core.dll
 D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Core.pdb
 D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\Newtonsoft.Json.dll
@@ -18,5 +17,6 @@ D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis.dll
 D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\RedisMicroservices.Domain.pdb
 D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\Newtonsoft.Json.xml
 D:\RedisMicroservices\RedisMicroservices.Core\bin\Debug\StackExchange.Redis.xml
+D:\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.csprojResolveAssemblyReference.cache
 D:\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.dll
 D:\RedisMicroservices\RedisMicroservices.Core\obj\Debug\RedisMicroservices.Core.pdb

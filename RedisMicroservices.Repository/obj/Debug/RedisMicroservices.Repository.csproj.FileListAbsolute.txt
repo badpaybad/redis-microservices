@@ -18,7 +18,6 @@ D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroser
 D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.DataAccess.pdb
 D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\EntityFramework.xml
 D:\work\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\EntityFramework.SqlServer.xml
-D:\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices.Repository.csprojResolveAssemblyReference.cache
 D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Repository.exe.config
 D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Repository.exe
 D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices.Repository.pdb
@@ -34,5 +33,8 @@ D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\RedisMicroservices
 D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\EntityFramework.xml
 D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\StackExchange.Redis.xml
 D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\Newtonsoft.Json.xml
+D:\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices.Repository.csprojResolveAssemblyReference.cache
 D:\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices.Repository.exe
 D:\RedisMicroservices\RedisMicroservices.Repository\obj\Debug\RedisMicroservices.Repository.pdb
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\EntityFramework.SqlServer.dll
+D:\RedisMicroservices\RedisMicroservices.Repository\bin\Debug\EntityFramework.SqlServer.xml
