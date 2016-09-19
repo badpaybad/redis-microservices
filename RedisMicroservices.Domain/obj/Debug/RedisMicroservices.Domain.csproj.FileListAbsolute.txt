@@ -1,7 +1,5 @@
 D:\work\RedisMicroservices\RedisMicroservices.Domain\bin\Debug\RedisMicroservices.Domain.dll
 D:\work\RedisMicroservices\RedisMicroservices.Domain\bin\Debug\RedisMicroservices.Domain.pdb
-D:\work\RedisMicroservices\RedisMicroservices.Domain\bin\Debug\Newtonsoft.Json.dll
-D:\work\RedisMicroservices\RedisMicroservices.Domain\bin\Debug\Newtonsoft.Json.xml
 D:\work\RedisMicroservices\RedisMicroservices.Domain\obj\Debug\RedisMicroservices.Domain.csprojResolveAssemblyReference.cache
 D:\work\RedisMicroservices\RedisMicroservices.Domain\obj\Debug\RedisMicroservices.Domain.dll
 D:\work\RedisMicroservices\RedisMicroservices.Domain\obj\Debug\RedisMicroservices.Domain.pdb
