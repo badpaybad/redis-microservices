@@ -81,3 +81,4 @@ D:\work\RedisMicroservices\RedisMicroservices.SampleWeb\bin\StackExchange.Redis.
 D:\work\RedisMicroservices\RedisMicroservices.SampleWeb\obj\Debug\RedisMicroservices.SampleWeb.csprojResolveAssemblyReference.cache
 D:\work\RedisMicroservices\RedisMicroservices.SampleWeb\obj\Debug\RedisMicroservices.SampleWeb.dll
 D:\work\RedisMicroservices\RedisMicroservices.SampleWeb\obj\Debug\RedisMicroservices.SampleWeb.pdb
+D:\RedisMicroservices\RedisMicroservices.SampleWeb\obj\Debug\RedisMicroservices.SampleWeb.csprojResolveAssemblyReference.cache

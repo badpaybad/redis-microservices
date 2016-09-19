@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity;
 using RedisMicroservices.Domain.Entity;
 
-namespace RedisMicroservices.Domain.Ef6
+namespace RedisMicroservices.DataAccess.Ef6
 {
     public class SampleDbContext:DbContext
     {

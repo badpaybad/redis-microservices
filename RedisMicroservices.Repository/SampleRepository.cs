@@ -5,8 +5,8 @@ using System.Linq.Expressions;
 using System.Security.Cryptography;
 using RedisMicroservices.Core.Distributed;
 using RedisMicroservices.Core.Repository;
+using RedisMicroservices.DataAccess.Ef6;
 using RedisMicroservices.Domain;
-using RedisMicroservices.Domain.Ef6;
 using RedisMicroservices.Domain.Entity;
 
 namespace RedisMicroservices.Repository

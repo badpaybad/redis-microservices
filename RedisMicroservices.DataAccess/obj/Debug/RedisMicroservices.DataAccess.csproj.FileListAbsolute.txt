@@ -12,3 +12,13 @@ D:\work\RedisMicroservices\RedisMicroservices.DataAccess\obj\Debug\RedisMicroser
 D:\work\RedisMicroservices\RedisMicroservices.DataAccess\obj\Debug\RedisMicroservices.DataAccess.pdb
 D:\work\RedisMicroservices\RedisMicroservices.DataAccess\bin\Debug\Newtonsoft.Json.dll
 D:\work\RedisMicroservices\RedisMicroservices.DataAccess\bin\Debug\Newtonsoft.Json.xml
+D:\RedisMicroservices\RedisMicroservices.DataAccess\obj\Debug\RedisMicroservices.DataAccess.csprojResolveAssemblyReference.cache
+D:\RedisMicroservices\RedisMicroservices.DataAccess\bin\Debug\RedisMicroservices.DataAccess.dll.config
+D:\RedisMicroservices\RedisMicroservices.DataAccess\bin\Debug\RedisMicroservices.DataAccess.dll
+D:\RedisMicroservices\RedisMicroservices.DataAccess\bin\Debug\RedisMicroservices.DataAccess.pdb
+D:\RedisMicroservices\RedisMicroservices.DataAccess\bin\Debug\EntityFramework.dll
+D:\RedisMicroservices\RedisMicroservices.DataAccess\bin\Debug\RedisMicroservices.Domain.dll
+D:\RedisMicroservices\RedisMicroservices.DataAccess\bin\Debug\RedisMicroservices.Domain.pdb
+D:\RedisMicroservices\RedisMicroservices.DataAccess\bin\Debug\EntityFramework.xml
+D:\RedisMicroservices\RedisMicroservices.DataAccess\obj\Debug\RedisMicroservices.DataAccess.dll
+D:\RedisMicroservices\RedisMicroservices.DataAccess\obj\Debug\RedisMicroservices.DataAccess.pdb
