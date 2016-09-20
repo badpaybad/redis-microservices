@@ -28,24 +28,20 @@ namespace RedisMicroservices.Core.Distributed
 
         static DistributedServices()
         {
-            var lck = RedisServices.RedisDatabase.ListLeftPop(juljulLock);
-            if (!lck.HasValue)
-            {
-                RedisServices.RedisDatabase.ListLeftPush(juljulLock, true);
-            }
             _findingResendCmd = new Thread(() =>
             {
                 while (true)
                 {
                     try
                     {
-                        
-                        var lckok = RedisServices.RedisDatabase.ListLeftPop(juljulLock);
-                        if (!lckok.HasValue)
+                        var lckok = RedisServices.RedisDatabase.StringGet(juljulLock);
+                        if (lckok.HasValue && lckok==true)
                         {
                             Thread.Sleep(1000);
                             continue;
                         }
+                        RedisServices.RedisDatabase.StringSet(juljulLock, true);
+
                         var allCmdPushed =
                             RedisServices.RedisDatabase.HashGetAll(juljulCommandLogPushed).ToList();
 
@@ -66,7 +62,8 @@ namespace RedisMicroservices.Core.Distributed
                             RedisServices.RedisDatabase.ListRightPush(juljulCommandResend, itm.Value);
                         }
                         allCmdPushed.Clear();
-                      
+
+                        RedisServices.RedisDatabase.StringSet(juljulLock, false);
                     }
                     catch (Exception ex)
                     {
@@ -102,8 +99,6 @@ namespace RedisMicroservices.Core.Distributed
                         if (success.HasValue) continue;
 
                         SendAnCmd(cmd, redisValue);
-
-                        RedisServices.RedisDatabase.ListLeftPush(juljulLock, true);
                     }
                     catch (Exception ex)
                     {
@@ -130,6 +125,10 @@ namespace RedisMicroservices.Core.Distributed
                             if (error.HasValue)
                             {
                                 var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(error);
+
+                                var success = RedisServices.RedisDatabase.HashGet(juljulCommandLogSucess, cmd.Id.ToString());
+
+                                if (success.HasValue) continue;
 
                                 SendAnCmd(cmd, error);
                             }
