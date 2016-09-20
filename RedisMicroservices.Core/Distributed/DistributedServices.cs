@@ -16,6 +16,7 @@ namespace RedisMicroservices.Core.Distributed
     {
         private static Thread _findingResendCmd;
         private static Thread _doResendCmd;
+        private static Thread _doResendCmdError;
         const string juljulCommandLogPushed = "juljul_command_log_pushed";
         const string juljulCommandLogPendding = "juljul_command_log_pendding";
         const string juljulCommandLogError = "juljul_command_log_error";
@@ -38,6 +39,7 @@ namespace RedisMicroservices.Core.Distributed
                 {
                     try
                     {
+                        
                         var lckok = RedisServices.RedisDatabase.ListLeftPop(juljulLock);
                         if (!lckok.HasValue)
                         {
@@ -50,11 +52,6 @@ namespace RedisMicroservices.Core.Distributed
                         var resendItems = new List<HashEntry>();
                         foreach (var cmdP in allCmdPushed)
                         {
-                            var error = RedisServices.RedisDatabase.ListRightPop(cmdP.Name.ToString());
-                            if (error.HasValue)
-                            {
-                                resendItems.Add(new HashEntry(cmdP.Name, error));
-                            }
                             var pending = RedisServices.RedisDatabase.HashGet(juljulCommandLogPendding, cmdP.Name);
                             var success = RedisServices.RedisDatabase.HashGet(juljulCommandLogSucess, cmdP.Name);
 
@@ -69,7 +66,7 @@ namespace RedisMicroservices.Core.Distributed
                             RedisServices.RedisDatabase.ListRightPush(juljulCommandResend, itm.Value);
                         }
                         allCmdPushed.Clear();
-                        RedisServices.RedisDatabase.ListLeftPush(juljulLock, true);
+                      
                     }
                     catch (Exception ex)
                     {
@@ -89,33 +86,24 @@ namespace RedisMicroservices.Core.Distributed
                     try
                     {
                         var redisValue = RedisServices.RedisDatabase.ListLeftPop(juljulCommandResend);
+                        if (!redisValue.HasValue) continue;
 
                         var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(redisValue);
 
                         var pending = RedisServices.RedisDatabase.HashGet(juljulCommandLogPendding, cmd.Id.ToString());
 
-                        if (pending.HasValue) continue;
+                        if (pending.HasValue)
+                        {
+                            continue;
+                        }
 
                         var success = RedisServices.RedisDatabase.HashGet(juljulCommandLogSucess, cmd.Id.ToString());
 
                         if (success.HasValue) continue;
 
-                        var dataType = cmd.DataType;
+                        SendAnCmd(cmd, redisValue);
 
-                        switch (cmd.DataBehavior)
-                        {
-                            case DataBehavior.Queue:
-                            case DataBehavior.Stack:
-                                RedisServices.RedisDatabase.ListRightPush(cmd.DataBehavior + dataType,
-                                    redisValue);
-                                break;
-                            case DataBehavior.PubSub:
-                                RedisServices.RedisDatabase.HashSet(cmd.DataBehavior + dataType, cmd.Id.ToString(),
-                                    redisValue);
-                                break;
-                        }
-
-                        RedisServices.RedisDatabase.Publish(dataType, redisValue);
+                        RedisServices.RedisDatabase.ListLeftPush(juljulLock, true);
                     }
                     catch (Exception ex)
                     {
@@ -128,8 +116,59 @@ namespace RedisMicroservices.Core.Distributed
                 }
             });
 
-            _findingResendCmd.Start();
-            _doResendCmd.Start();
+            _doResendCmdError = new Thread(() =>
+            {
+                while (true)
+                {
+                    try
+                    {
+                        var allCmdPushed =
+                            RedisServices.RedisDatabase.HashGetAll(juljulCommandLogPushed).ToList();
+                        foreach (var cmdP in allCmdPushed)
+                        {
+                            var error = RedisServices.RedisDatabase.ListRightPop(cmdP.Name.ToString());
+                            if (error.HasValue)
+                            {
+                                var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(error);
+
+                                SendAnCmd(cmd, error);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    finally
+                    {
+                        Thread.Sleep(1000);
+                    }
+                }
+            });
+
+            //_findingResendCmd.Start();
+            //_doResendCmd.Start();
+            //_doResendCmdError.Start();
+        }
+
+        private static void SendAnCmd(BaseDistributedCommand cmd, RedisValue redisValue)
+        {
+            var dataType = cmd.DataType;
+
+            switch (cmd.DataBehavior)
+            {
+                case DataBehavior.Queue:
+                case DataBehavior.Stack:
+                    RedisServices.RedisDatabase.ListRightPush(cmd.DataBehavior + dataType,
+                        redisValue);
+                    break;
+                case DataBehavior.PubSub:
+                    RedisServices.RedisDatabase.HashSet(cmd.DataBehavior + dataType, cmd.Id.ToString(),
+                        redisValue);
+                    break;
+            }
+
+            RedisServices.RedisDatabase.Publish(dataType, redisValue);
         }
 
         public void Publish<T>(DistributedCommand<T> cmd, Action<Exception> errorCallback = null) where T : class
@@ -149,7 +188,7 @@ namespace RedisMicroservices.Core.Distributed
                             redisValue);
                         break;
                 }
-
+                SendAnCmd(cmd, redisValue);
                 RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
 
                 LogPushed<T>(cmd.Id, cmd.ToJson());
