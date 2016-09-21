@@ -145,8 +145,8 @@ namespace RedisMicroservices.Core.Distributed
                 }
             });
 
-            //_findingResendCmd.Start();
-            //_doResendCmd.Start();
+            _findingResendCmd.Start();
+            _doResendCmd.Start();
             //_doResendCmdError.Start();
         }
 
