@@ -15,7 +15,6 @@ namespace RedisMicroservices.Core.Distributed
     public class DistributedServices : IDistributedServices
     {
         private static Thread _findingResendCmd;
-        private static Thread _doResendCmd;
         private static Thread _doResendCmdError;
         const string juljulCommandLogPushed = "juljul_command_log_pushed";
         const string juljulCommandLogPendding = "juljul_command_log_pendding";
@@ -28,24 +27,20 @@ namespace RedisMicroservices.Core.Distributed
 
         static DistributedServices()
         {
-            var lck = RedisServices.RedisDatabase.ListLeftPop(juljulLock);
-            if (!lck.HasValue)
-            {
-                RedisServices.RedisDatabase.ListLeftPush(juljulLock, true);
-            }
             _findingResendCmd = new Thread(() =>
             {
                 while (true)
                 {
                     try
                     {
-                        
-                        var lckok = RedisServices.RedisDatabase.ListLeftPop(juljulLock);
-                        if (!lckok.HasValue)
+                        var lckok = RedisServices.RedisDatabase.StringGet(juljulLock);
+                        if (lckok.HasValue && lckok==true)
                         {
                             Thread.Sleep(1000);
                             continue;
                         }
+                         RedisServices.RedisDatabase.StringSet(juljulLock,true);
+
                         var allCmdPushed =
                             RedisServices.RedisDatabase.HashGetAll(juljulCommandLogPushed).ToList();
 
@@ -63,7 +58,22 @@ namespace RedisMicroservices.Core.Distributed
 
                         foreach (var itm in resendItems)
                         {
-                            RedisServices.RedisDatabase.ListRightPush(juljulCommandResend, itm.Value);
+                            var redisValue = itm.Value;
+                            var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(redisValue);
+
+                            var pending = RedisServices.RedisDatabase.HashGet(juljulCommandLogPendding, cmd.Id.ToString());
+
+                            if (pending.HasValue)
+                            {
+                                continue;
+                            }
+
+                            var success = RedisServices.RedisDatabase.HashGet(juljulCommandLogSucess, cmd.Id.ToString());
+
+                            if (success.HasValue) continue;
+
+                            SendAnCmd(cmd, redisValue);
+
                         }
                         allCmdPushed.Clear();
                       
@@ -75,47 +85,11 @@ namespace RedisMicroservices.Core.Distributed
                     finally
                     {
                         Thread.Sleep(1000);
+                        RedisServices.RedisDatabase.StringSet(juljulLock, false);
                     }
                 }
             });
-
-            _doResendCmd = new Thread(() =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        var redisValue = RedisServices.RedisDatabase.ListLeftPop(juljulCommandResend);
-                        if (!redisValue.HasValue) continue;
-
-                        var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(redisValue);
-
-                        var pending = RedisServices.RedisDatabase.HashGet(juljulCommandLogPendding, cmd.Id.ToString());
-
-                        if (pending.HasValue)
-                        {
-                            continue;
-                        }
-
-                        var success = RedisServices.RedisDatabase.HashGet(juljulCommandLogSucess, cmd.Id.ToString());
-
-                        if (success.HasValue) continue;
-
-                        SendAnCmd(cmd, redisValue);
-
-                        RedisServices.RedisDatabase.ListLeftPush(juljulLock, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
-                    finally
-                    {
-                        Thread.Sleep(1000);
-                    }
-                }
-            });
-
+            
             _doResendCmdError = new Thread(() =>
             {
                 while (true)
@@ -127,12 +101,15 @@ namespace RedisMicroservices.Core.Distributed
                         foreach (var cmdP in allCmdPushed)
                         {
                             var error = RedisServices.RedisDatabase.ListRightPop(cmdP.Name.ToString());
-                            if (error.HasValue)
-                            {
-                                var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(error);
+                            if (!error.HasValue) continue;
 
-                                SendAnCmd(cmd, error);
-                            }
+                            var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(error);
+
+                            var success = RedisServices.RedisDatabase.HashGet(juljulCommandLogSucess, cmd.Id.ToString());
+
+                            if (success.HasValue) continue;
+
+                            SendAnCmd(cmd, error);
                         }
                     }
                     catch (Exception ex)
@@ -146,9 +123,8 @@ namespace RedisMicroservices.Core.Distributed
                 }
             });
 
-            //_findingResendCmd.Start();
-            //_doResendCmd.Start();
-            //_doResendCmdError.Start();
+            _findingResendCmd.Start();
+            _doResendCmdError.Start();
         }
 
         private static void SendAnCmd(BaseDistributedCommand cmd, RedisValue redisValue)
@@ -167,7 +143,7 @@ namespace RedisMicroservices.Core.Distributed
                         redisValue);
                     break;
             }
-
+            
             RedisServices.RedisDatabase.Publish(dataType, redisValue);
         }
 
