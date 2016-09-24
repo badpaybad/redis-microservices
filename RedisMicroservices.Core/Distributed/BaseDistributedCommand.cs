@@ -8,7 +8,7 @@ namespace RedisMicroservices.Core.Distributed
         public virtual DataBehavior DataBehavior { get; set; }
         public virtual string DataType { get; set; }
 
-        //public virtual CommandStatus CommandStatus { get; set; }
+        public virtual CommandStatus CommandStatus { get; set; }
 
         public BaseDistributedCommand()
         {

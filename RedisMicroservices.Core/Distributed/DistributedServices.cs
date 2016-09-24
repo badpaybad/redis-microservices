@@ -34,7 +34,7 @@ namespace RedisMicroservices.Core.Distributed
                     try
                     {
                         var lckok = RedisServices.RedisDatabase.StringGet(juljulLock);
-                        if (lckok.HasValue && lckok == true)
+                        if (lckok.HasValue && (bool)lckok )
                         {
                             Thread.Sleep(1000);
                             continue;
@@ -120,7 +120,7 @@ namespace RedisMicroservices.Core.Distributed
             });
 
             _findingResendCmd.Start();
-            _doResendCmdError.Start();
+            //_doResendCmdError.Start();
         }
 
         private static void SendAnCmd(BaseDistributedCommand cmd, RedisValue redisValue)
@@ -163,6 +163,7 @@ namespace RedisMicroservices.Core.Distributed
                 SendAnCmd(cmd, redisValue);
                 RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
 
+                cmd.CommandStatus = CommandStatus.Pushed;
                 LogPushed<T>(cmd.Id, cmd.ToJson());
 
                 Console.WriteLine("Pushed:" + redisValue);
@@ -186,6 +187,7 @@ namespace RedisMicroservices.Core.Distributed
                     var cmd = JsonConvert.DeserializeObject<DistributedCommand<T>>(value);
                     try
                     {
+                        cmd.CommandStatus= CommandStatus.Pedding;
                         LogPendding<T>(cmd.Id, cmd.ToJson());
                         bool isDone = false;
                         switch (cmd.DataBehavior)
@@ -221,6 +223,7 @@ namespace RedisMicroservices.Core.Distributed
                         }
                         if (isDone)
                         {
+                            cmd.CommandStatus = CommandStatus.Success;
                             LogSuccess<T>(cmd.Id, cmd.ToJson());
                             Console.WriteLine("Done:" + value);
                         }
@@ -264,6 +267,7 @@ namespace RedisMicroservices.Core.Distributed
                 }
                 RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
 
+                cmd.CommandStatus = CommandStatus.Pushed;
                 LogPushed<T>(cmd.Id, cmd.ToJson());
 
                 Console.WriteLine("Pushed:" + redisValue);
@@ -286,6 +290,7 @@ namespace RedisMicroservices.Core.Distributed
                     var cmd = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(value);
                     try
                     {
+                        cmd.CommandStatus = CommandStatus.Pedding;
                         LogPendding<T>(cmd.Id, cmd.ToJson());
                         bool isDone = false;
                         switch (cmd.DataBehavior)
@@ -321,6 +326,7 @@ namespace RedisMicroservices.Core.Distributed
                         }
                         if (isDone)
                         {
+                            cmd.CommandStatus = CommandStatus.Success;
                             LogSuccess<T>(cmd.Id, cmd.ToJson());
                             Console.WriteLine("Done:" + value);
                         }
@@ -364,6 +370,7 @@ namespace RedisMicroservices.Core.Distributed
 
                 RedisServices.RedisSubscriber.Publish(redisChannel, redisValue);
 
+                cmd.CommandStatus = CommandStatus.Pushed;
                 LogPushed<T>(cmd.Id, cmd.ToJson());
 
                 Console.WriteLine("Pushed:" + redisValue);
@@ -388,6 +395,7 @@ namespace RedisMicroservices.Core.Distributed
                     var cmd = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(value);
                     try
                     {
+                        cmd.CommandStatus = CommandStatus.Pedding;
                         LogPendding<T>(cmd.Id, cmd.ToJson());
 
                         bool isDone = false;
@@ -412,7 +420,7 @@ namespace RedisMicroservices.Core.Distributed
                                 }
                                 break;
                             case DataBehavior.PubSub:
-                                //how to log success for all subcribers
+                                
                                 var da = RedisServices.RedisDatabase.HashGet(cmd.DataBehavior + redisChannel,
                                     cmd.Id.ToString());
                                 if (da.HasValue)
@@ -425,6 +433,7 @@ namespace RedisMicroservices.Core.Distributed
                         }
                         if (isDone)
                         {
+                            cmd.CommandStatus = CommandStatus.Success;
                             LogSuccess<T>(cmd.Id, cmd.ToJson());
                             Console.WriteLine("Done:" + value);
                         }
@@ -451,7 +460,7 @@ namespace RedisMicroservices.Core.Distributed
 
         void LogPushed<T>(Guid cmdId, RedisValue cmdJson) where T : class
         {
-            var dataType = typeof (T).ToString();
+            var dataType = typeof (T).FullName;
             RedisServices.RedisDatabase.HashSet(juljulChannelByDataType, dataType, cmdJson);
             RedisServices.RedisDatabase.HashSet(juljulCommandLogPushed, cmdId.ToString(), cmdJson);
         }
