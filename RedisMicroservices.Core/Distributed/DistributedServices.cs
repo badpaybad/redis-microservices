@@ -18,7 +18,7 @@ namespace RedisMicroservices.Core.Distributed
     {
         private static Thread _commandQueue;
         private static Thread _findingResendCmd;
-        private static Thread _doResendCmdError;
+
         const string juljulCommandLogPushed = "juljul_command_log_pushed";
         const string juljulCommandLogPendding = "juljul_command_log_pendding";
         const string juljulCommandLogError = "juljul_command_log_error";
@@ -26,11 +26,7 @@ namespace RedisMicroservices.Core.Distributed
         const string juljulChannelByDataType = "juljul_channel_log_by_data_type";
 
         const string juljulCommandQueueWaitToSend = "juljul_command_queue_wait_to_send";
-
-        const string juljulLock = "juljul_lock";
-
-        const string juljulCommandResend = "juljul_command_resend";
-
+        
         static DistributedServices()
         {
             _commandQueue = new Thread(() =>
@@ -44,7 +40,7 @@ namespace RedisMicroservices.Core.Distributed
                         while (true)
                         {
                             var redisValue = RedisServices.RedisDatabase.ListLeftPop(juljulCommandQueueWaitToSend);
-                            if (!redisValue.HasValue || counter>100) break;
+                            if (!redisValue.HasValue || counter > 100) break;
 
                             counter++;
                             cmds.Add(redisValue);
@@ -55,6 +51,9 @@ namespace RedisMicroservices.Core.Distributed
                             foreach (var redisValue in cmds)
                             {
                                 var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(redisValue);
+
+                                var pending = RedisServices.RedisDatabase.HashGet(juljulCommandLogPendding, cmd.Id.ToString());
+                                if (!pending.HasValue) continue;
 
                                 var channel = cmd.DataType;
                                 Console.WriteLine("Publishing channel: " + channel);
@@ -104,15 +103,14 @@ namespace RedisMicroservices.Core.Distributed
                         foreach (var cmdP in allCmdPushed)
                         {
                             var pending = RedisServices.RedisDatabase.HashGet(juljulCommandLogPendding, cmdP.Name);
-                            var success = RedisServices.RedisDatabase.HashGet(juljulCommandLogSucess, cmdP.Name);
 
                             if (pending.HasValue) continue;
-                            if (success.HasValue) continue;
-
+                            
                             var redisValue = cmdP.Value;
                             var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(redisValue);
 
-                            RedisServices.RedisDatabase.ListRightPush(juljulCommandQueueWaitToSend, redisValue);
+                            // RedisServices.RedisDatabase.ListRightPush(juljulCommandQueueWaitToSend, redisValue);
+                            RedisServices.RedisDatabase.Publish(cmd.DataType, redisValue);
 
                             Console.WriteLine("--resend cmd: " + cmd.Id);
                             Console.WriteLine("--------data: " + redisValue);
@@ -126,42 +124,12 @@ namespace RedisMicroservices.Core.Distributed
                     }
                     finally
                     {
-                        Thread.Sleep(1000);
+                        Thread.Sleep(5000);
                     }
                 }
             });
 
-            _doResendCmdError = new Thread(() =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        var allCmdPushed =
-                            RedisServices.RedisDatabase.HashGetAll(juljulCommandLogPushed).ToList();
-                        foreach (var cmdP in allCmdPushed)
-                        {
-                            var error = RedisServices.RedisDatabase.HashGet(juljulCommandLogError, cmdP.Name);
-                            if (!error.HasValue) continue;
-
-                            var success = RedisServices.RedisDatabase.HashGet(juljulCommandLogSucess, cmdP.Name);
-
-                            if (success.HasValue) continue;
-
-                            RedisServices.RedisDatabase.ListRightPush(juljulCommandQueueWaitToSend, error);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
-                    finally
-                    {
-                        Thread.Sleep(1000);
-                    }
-                }
-            });
-
+          
             _findingResendCmd.Start();
             //_doResendCmdError.Start();
             _commandQueue.Start();
@@ -445,7 +413,7 @@ namespace RedisMicroservices.Core.Distributed
 
         private void LogPendding<T>(Guid cmdId, RedisValue cmdJson)
         {
-            RedisServices.RedisDatabase.HashSet(juljulCommandLogPendding, cmdId.ToString(), cmdJson);
+              RedisServices.RedisDatabase.HashSet(juljulCommandLogPendding, cmdId.ToString(), cmdJson);
         }
 
         static void LogPushed(string dataType, Guid cmdId, RedisValue cmdJson)
@@ -461,7 +429,13 @@ namespace RedisMicroservices.Core.Distributed
 
         void LogSuccess<T>(Guid cmdId, RedisValue cmdJson) where T : class
         {
-            RedisServices.RedisDatabase.HashSet(juljulCommandLogSucess, cmdId.ToString(), cmdJson);
+            var cmdid = cmdId.ToString();
+            RedisServices.RedisDatabase.HashSet(juljulCommandLogSucess, cmdid, cmdJson);
+            var error = RedisServices.RedisDatabase.HashGet(juljulCommandLogError, cmdid);
+            if (error.HasValue)
+            {
+                RedisServices.RedisDatabase.HashDelete(juljulCommandLogError, cmdid);
+            }
         }
 
         void TryCatchLog(Action a)
