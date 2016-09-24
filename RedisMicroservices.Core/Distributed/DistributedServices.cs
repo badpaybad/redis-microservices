@@ -29,6 +29,13 @@ namespace RedisMicroservices.Core.Distributed
 
         static DistributedServices()
         {
+            TryDequeueToPublishCmd();
+
+            TryRepublishCmd();
+        }
+
+        private static void TryDequeueToPublishCmd()
+        {
             _commandQueue = new Thread(() =>
             {
                 while (true)
@@ -51,7 +58,7 @@ namespace RedisMicroservices.Core.Distributed
                             foreach (var redisValue in cmds)
                             {
                                 var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(redisValue);
-                                
+
                                 var channel = cmd.DataType;
                                 Console.WriteLine("Publishing channel: " + channel);
                                 var dataKeyStored = cmd.DataBehavior + channel;
@@ -70,7 +77,6 @@ namespace RedisMicroservices.Core.Distributed
 
                                 RedisServices.RedisDatabase.Publish(channel, redisValue);
 
-                                cmd.CommandStatus = CommandStatus.Pushed;
                                 LogPushed(channel, cmd.Id, redisValue);
 
                                 Console.WriteLine("Pushed:" + redisValue);
@@ -83,11 +89,16 @@ namespace RedisMicroservices.Core.Distributed
                     }
                     finally
                     {
-                        Thread.Sleep(10);
+                        Thread.Sleep(100);
                     }
                 }
             });
 
+            _commandQueue.Start();
+        }
+
+        private static void TryRepublishCmd()
+        {
             _findingResendCmd = new Thread(() =>
             {
                 while (true)
@@ -126,10 +137,7 @@ namespace RedisMicroservices.Core.Distributed
                 }
             });
 
-
             _findingResendCmd.Start();
-            //_doResendCmdError.Start();
-            _commandQueue.Start();
         }
 
 
@@ -191,18 +199,17 @@ namespace RedisMicroservices.Core.Distributed
                     var cmd = JsonConvert.DeserializeObject<DistributedCommand<T>>(value);
                     try
                     {
-                        cmd.CommandStatus = CommandStatus.Pedding;
-                        LogPendding<T>(cmd.Id, cmd.ToJson());
-                        bool isDone = false;
+                        LogPendding<T>(cmd.Id, value);
                         var dataKeyStored = cmd.DataBehavior + redisChannel;
+                        bool isDone = false;
                         switch (cmd.DataBehavior)
                         {
                             case DataBehavior.Queue:
                                 var qv = RedisServices.RedisDatabase.ListLeftPop(dataKeyStored);
                                 if (qv.HasValue)
                                 {
-                                    var val = JsonConvert.DeserializeObject<DistributedCommand<T>>(qv);
-                                    callBack(redisChannel, val);
+                                    var data = JsonConvert.DeserializeObject<DistributedCommand<T>>(qv);
+                                    callBack(redisChannel, data);
                                     isDone = true;
                                 }
                                 break;
@@ -210,8 +217,8 @@ namespace RedisMicroservices.Core.Distributed
                                 var sv = RedisServices.RedisDatabase.ListRightPop(dataKeyStored);
                                 if (sv.HasValue)
                                 {
-                                    var val = JsonConvert.DeserializeObject<DistributedCommand<T>>(sv);
-                                    callBack(redisChannel, val);
+                                    var data = JsonConvert.DeserializeObject<DistributedCommand<T>>(sv);
+                                    callBack(redisChannel, data);
                                     isDone = true;
                                 }
                                 break;
@@ -220,26 +227,23 @@ namespace RedisMicroservices.Core.Distributed
                                     cmd.Id.ToString());
                                 if (da.HasValue)
                                 {
-                                    var val = JsonConvert.DeserializeObject<DistributedCommand<T>>(da);
-                                    callBack(redisChannel, val);
+                                    var data = JsonConvert.DeserializeObject<DistributedCommand<T>>(da);
+                                    callBack(redisChannel, data);
                                     isDone = true;
                                 }
                                 break;
                         }
                         if (isDone)
                         {
-                            cmd.CommandStatus = CommandStatus.Success;
                             LogSuccess<T>(cmd.Id, cmd.ToJson());
                             Console.WriteLine("Done:" + value);
                         }
                     }
                     catch (Exception ex)
                     {
-                        cmd.CommandStatus = CommandStatus.Error;
                         var redisValue = cmd.ToJson();
                         LogError<T>(cmd.Id, redisValue);
-                        Console.WriteLine("----cmdid: " + cmd.Id);
-                        Console.WriteLine("---data  : " + redisValue);
+                      
                         Console.WriteLine(ex);
                         if (errorCallback != null) errorCallback(ex);
                     }
@@ -263,8 +267,7 @@ namespace RedisMicroservices.Core.Distributed
                     var cmd = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(value);
                     try
                     {
-                        cmd.CommandStatus = CommandStatus.Pedding;
-                        LogPendding<T>(cmd.Id, cmd.ToJson());
+                        LogPendding<T>(cmd.Id, value);
                         bool isDone = false;
                         switch (cmd.DataBehavior)
                         {
@@ -272,8 +275,8 @@ namespace RedisMicroservices.Core.Distributed
                                 var qv = RedisServices.RedisDatabase.ListLeftPop(cmd.DataBehavior + redisChannel);
                                 if (qv.HasValue)
                                 {
-                                    var val = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(qv);
-                                    callBack(redisChannel, val);
+                                    var data = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(qv);
+                                    callBack(redisChannel, data);
                                     isDone = true;
                                 }
                                 break;
@@ -281,8 +284,8 @@ namespace RedisMicroservices.Core.Distributed
                                 var sv = RedisServices.RedisDatabase.ListRightPop(cmd.DataBehavior + redisChannel);
                                 if (sv.HasValue)
                                 {
-                                    var val = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(sv);
-                                    callBack(redisChannel, val);
+                                    var data = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(sv);
+                                    callBack(redisChannel, data);
                                     isDone = true;
                                 }
                                 break;
@@ -291,26 +294,23 @@ namespace RedisMicroservices.Core.Distributed
                                     cmd.Id.ToString());
                                 if (da.HasValue)
                                 {
-                                    var val = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(da);
-                                    callBack(redisChannel, val);
+                                    var data = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(da);
+                                    callBack(redisChannel, data);
                                     isDone = true;
                                 }
                                 break;
                         }
                         if (isDone)
                         {
-                            cmd.CommandStatus = CommandStatus.Success;
                             LogSuccess<T>(cmd.Id, cmd.ToJson());
                             Console.WriteLine("Done:" + value);
                         }
                     }
                     catch (Exception ex)
                     {
-                        cmd.CommandStatus = CommandStatus.Error;
                         var redisValue = cmd.ToJson();
                         LogError<T>(cmd.Id, redisValue);
-                        Console.WriteLine("----cmdid: " + cmd.Id);
-                        Console.WriteLine("---data  : " + redisValue);
+                      
                         Console.WriteLine(ex);
                         if (errorCallback != null) errorCallback(ex);
                     }
@@ -336,8 +336,7 @@ namespace RedisMicroservices.Core.Distributed
                     var cmd = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(value);
                     try
                     {
-                        cmd.CommandStatus = CommandStatus.Pedding;
-                        LogPendding<T>(cmd.Id, cmd.ToJson());
+                        LogPendding<T>(cmd.Id, value);
 
                         bool isDone = false;
                         switch (cmd.DataBehavior)
@@ -346,8 +345,8 @@ namespace RedisMicroservices.Core.Distributed
                                 var qv = RedisServices.RedisDatabase.ListLeftPop(cmd.DataBehavior + redisChannel);
                                 if (qv.HasValue)
                                 {
-                                    var val = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(qv);
-                                    callBack(redisChannel, val);
+                                    var data = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(qv);
+                                    callBack(redisChannel, data);
                                     isDone = true;
                                 }
                                 break;
@@ -355,8 +354,8 @@ namespace RedisMicroservices.Core.Distributed
                                 var sv = RedisServices.RedisDatabase.ListRightPop(cmd.DataBehavior + redisChannel);
                                 if (sv.HasValue)
                                 {
-                                    var val = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(sv);
-                                    callBack(redisChannel, val);
+                                    var data = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(sv);
+                                    callBack(redisChannel, data);
                                     isDone = true;
                                 }
                                 break;
@@ -366,26 +365,23 @@ namespace RedisMicroservices.Core.Distributed
                                     cmd.Id.ToString());
                                 if (da.HasValue)
                                 {
-                                    var val = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(da);
-                                    callBack(redisChannel, val);
+                                    var data = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(da);
+                                    callBack(redisChannel, data);
                                     isDone = true;
                                 }
                                 break;
                         }
                         if (isDone)
                         {
-                            cmd.CommandStatus = CommandStatus.Success;
                             LogSuccess<T>(cmd.Id, cmd.ToJson());
                             Console.WriteLine("Done:" + value);
                         }
                     }
                     catch (Exception ex)
                     {
-                        cmd.CommandStatus = CommandStatus.Error;
                         var redisValue = cmd.ToJson();
                         LogError<T>(cmd.Id, redisValue);
-                        Console.WriteLine("----cmdid: " + cmd.Id);
-                        Console.WriteLine("---data  : " + redisValue);
+                   
                         Console.WriteLine(ex);
                         if (errorCallback != null) errorCallback(ex);
                     }

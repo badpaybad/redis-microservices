@@ -15,8 +15,8 @@ namespace RedisMicroservices.ConsolePushTest
     {
         public static void Main(string[] args)
         {
-            //RepositoryEngine.Boot();
-            //ServicesEngine.Boot();
+            RepositoryEngine.Boot();
+            ServicesEngine.Boot();
 
             var ds = new DistributedServices();
 
