@@ -17,6 +17,26 @@ using RedisMicroservices.Services;
 namespace RedisMicroservices.UnitTest
 {
     [TestClass]
+    public class RedisTest
+    {
+        [TestMethod]
+        public void Get()
+        {
+            var total = 0;
+            while (true)
+            {
+                  var xxx = RedisServices.RedisDatabase.ListLeftPop("QueueRedisMicroservices.Domain.DataModel.SampleData");
+                if (!xxx.HasValue) break;
+
+                total++;
+            Console.WriteLine(xxx);
+            }
+          
+            Console.WriteLine(total);
+        }
+    }
+
+    [TestClass]
     public class PushCommandTest
     {
 
@@ -41,6 +61,8 @@ namespace RedisMicroservices.UnitTest
                 sampleData, EntityAction.Insert));
 
             Console.WriteLine(sampleData.Id);
+
+            Thread.Sleep(2000);
         }
 
         [TestMethod]

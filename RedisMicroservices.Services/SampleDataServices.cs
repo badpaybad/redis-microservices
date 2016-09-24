@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Newtonsoft.Json;
 using RedisMicroservices.Core.Distributed;
 using RedisMicroservices.Core.Repository;
 using RedisMicroservices.Domain;
@@ -41,7 +42,7 @@ namespace RedisMicroservices.Services
             //call other business
             _langguageServices.DoSomething(new LanguageData()
             {
-                Code= data.LanguageCode
+                Code = data.LanguageCode
             });
 
             data.CreatedDate = DateTime.Now;
@@ -49,12 +50,18 @@ namespace RedisMicroservices.Services
             //after all push to message queue using distributed services
 
             //push command to store by repository engine
-            _distributedServices.PublishEntity(new DistributedCommandEntity<Sample>(new Sample()
+            var entity = new Sample()
             {
                 Id = data.Id,
                 Version = data.Version,
-                Name= data.Name
-            }, EntityAction.Insert));
+                Name = data.Name
+            };
+            var distributedCommandEntity = new DistributedCommandEntity<Sample>(entity, EntityAction.Insert);
+
+            Console.WriteLine("Entity created to publish");
+            Console.WriteLine(JsonConvert.SerializeObject(distributedCommandEntity));
+
+            _distributedServices.PublishEntity(distributedCommandEntity);
         }
 
         public void DoSomething(SampleData data)

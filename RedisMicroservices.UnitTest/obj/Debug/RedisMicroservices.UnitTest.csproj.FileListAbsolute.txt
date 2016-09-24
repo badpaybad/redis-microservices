@@ -20,3 +20,6 @@ D:\work\RedisMicroservices\RedisMicroservices.UnitTest\bin\Debug\RedisMicroservi
 D:\work\RedisMicroservices\RedisMicroservices.UnitTest\bin\Debug\RedisMicroservices.Repository.pdb
 D:\work\RedisMicroservices\RedisMicroservices.UnitTest\bin\Debug\RedisMicroservices.Services.pdb
 D:\work\RedisMicroservices\RedisMicroservices.UnitTest\bin\Debug\EntityFramework.xml
+D:\work\RedisMicroservices\RedisMicroservices.UnitTest\bin\Debug\RedisMicroservices.UnitTest.dll.config
+D:\work\RedisMicroservices\RedisMicroservices.UnitTest\bin\Debug\EntityFramework.SqlServer.dll
+D:\work\RedisMicroservices\RedisMicroservices.UnitTest\bin\Debug\EntityFramework.SqlServer.xml
