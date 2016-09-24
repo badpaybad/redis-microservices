@@ -22,7 +22,12 @@ namespace RedisMicroservices.Core.Redis
                 }
 
                 _connectionMultiplexer = GetConnection();
-                if(!_connectionMultiplexer.IsConnected) throw new Exception("Can not connect to redis");
+                if (!_connectionMultiplexer.IsConnected)
+                {
+                    var exception = new Exception("Can not connect to redis");
+                    Console.WriteLine(exception);
+                    throw exception;
+                }
                 return _connectionMultiplexer;
             }
         }
@@ -32,7 +37,7 @@ namespace RedisMicroservices.Core.Redis
             get
             {
                 var redisDatabase = RedisConnectionMultiplexer.GetDatabase();
-                
+               
                 return redisDatabase;
             }
         }

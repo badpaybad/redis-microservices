@@ -11,19 +11,18 @@ using RedisMicroservices.Domain.Entity;
 
 namespace RedisMicroservices.Repository
 {
-    public class SampleRepository : IRepositoryEngine<Sample>,ISampleRepository
+    public class SampleRepository : IRepositoryEngine<Sample>, ISampleRepository
     {
-           
-       public void Insert(Sample entity)
+        public void Insert(Sample entity)
         {
             //using eneity framework to insert into db
-           using (var db=new SampleDbContext())
-           {
-              // if (db.Samples.Any(i => i.Id == entity.Id)) return;
+            using (var db = new SampleDbContext())
+            {
+                // if (db.Samples.Any(i => i.Id == entity.Id)) return;
 
-               db.Samples.Add(entity);
-               db.SaveChanges();
-           }
+                db.Samples.Add(entity);
+                db.SaveChanges();
+            }
         }
 
         public void Update(Sample entity)
@@ -52,19 +51,17 @@ namespace RedisMicroservices.Repository
             {
                 switch (v.EntityAction)
                 {
-                        case EntityAction.Insert:
-                            Insert(v.Data);
+                    case EntityAction.Insert:
+                        Insert(v.Data);
                         break;
-                        case EntityAction.Update:
+                    case EntityAction.Update:
                         //
                         break;
-                        case EntityAction.Delete:
+                    case EntityAction.Delete:
                         //
                         break;
                 }
             });
         }
-
-        
     }
 }
