@@ -8,43 +8,27 @@ using RedisMicroservices.DataAccess.Ef6;
 using RedisMicroservices.Domain;
 using RedisMicroservices.Domain.DataModel;
 using RedisMicroservices.Domain.Entity;
+using RedisMicroservices.SampleWeb.Business;
 
 namespace RedisMicroservices.SampleWeb.Controllers
 {
     public class HomeController : Controller
     {
-        IDistributedServices _distributedServices = new DistributedServices();
+        SampleManager _sampleManager = new SampleManager();
 
         public ActionResult Index()
         {
-            //we can use direct select, join ... to create view model ...
-            //we dont use exec command to do with db
-            //because username in connection string only had permission to select from db
-            List<Sample> allSample;
-
-            using (var db = new SampleDbContext())
-            {
-                allSample = db.Samples.ToList();
-            }
-            return View(allSample);
+            return View(_sampleManager.ListAll());
         }
 
         [HttpPost]
         public ActionResult CreateRandom(SampleData data)
         {
-            //we dont use exec command to do with db
-            //we push command to manipulate with db
-            // push data (SampleData obj) to ServicesEngine if want to do complex business
-            data.CreatedDate = DateTime.Now;
+             data.CreatedDate = DateTime.Now;
 
-            _distributedServices.PublishDataModel(new DistributedCommandDataModel<SampleData>(
-                data, EntityAction.Insert, DataBehavior.Queue));
+            _sampleManager.Create(data);
 
-            // push data (Sample obj) to RepositoryEngine if want to do simple manipulate with db
-
-            //_distributedServices.PublishEntity(new DistributedCommandEntity<Sample>(
-            // entity, EntityAction.Insert, DataBehavior.Queue ));
-
+         
             return RedirectToAction("Index");
         }
 
