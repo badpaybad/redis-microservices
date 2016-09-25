@@ -58,9 +58,6 @@ namespace RedisMicroservices.Services
             };
             var distributedCommandEntity = new DistributedCommandEntity<Sample>(entity, EntityAction.Insert);
 
-            Console.WriteLine("Entity created to publish");
-            Console.WriteLine(JsonConvert.SerializeObject(distributedCommandEntity));
-
             _distributedServices.PublishEntity(distributedCommandEntity);
         }
 

@@ -60,12 +60,12 @@ namespace RedisMicroservices.Core.Distributed
                                 var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(redisValue);
 
                                 var channel = cmd.DataType;
-                                Console.WriteLine("Publishing channel: " + channel);
                                 var dataKeyStored = cmd.DataBehavior + channel;
                                 switch (cmd.DataBehavior)
                                 {
                                     case DataBehavior.Queue:
                                     case DataBehavior.Stack:
+                                 
                                         RedisServices.RedisDatabase.ListRightPush(dataKeyStored,
                                             redisValue);
                                         break;
@@ -115,13 +115,10 @@ namespace RedisMicroservices.Core.Distributed
                             if (pending.HasValue) continue;
 
                             var redisValue = cmdP.Value;
-                            var cmd = JsonConvert.DeserializeObject<BaseDistributedCommand>(redisValue);
 
                             RedisServices.RedisDatabase.ListRightPush(juljulCommandQueueWaitToSend, redisValue);
-                            //RedisServices.RedisDatabase.Publish(cmd.DataType, redisValue);
 
-                            Console.WriteLine("--resend cmd: " + cmd.Id);
-                            Console.WriteLine("--------data: " + redisValue);
+                            Console.WriteLine("--repush cmd: "+cmdP.Name+" --data: " + redisValue);
                         }
 
                         allCmdPushed.Clear();
@@ -140,6 +137,21 @@ namespace RedisMicroservices.Core.Distributed
             _findingResendCmd.Start();
         }
 
+    
+        public void Publish<T>(DistributedCommand<T> cmd, Action<Exception> errorCallback = null) where T : class
+        {
+            try
+            {
+                var redisValue = cmd.ToJson();
+
+                RedisServices.RedisDatabase.ListRightPush(juljulCommandQueueWaitToSend, redisValue);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                if (errorCallback != null) errorCallback(ex);
+            }
+        }
 
         public void PublishEntity<T>(DistributedCommandEntity<T> cmd, Action<Exception> errorCallback = null)
             where T : class, IEntity
@@ -157,20 +169,6 @@ namespace RedisMicroservices.Core.Distributed
             }
         }
 
-        public void Publish<T>(DistributedCommand<T> cmd, Action<Exception> errorCallback = null) where T : class
-        {
-            try
-            {
-                var redisValue = cmd.ToJson();
-
-                RedisServices.RedisDatabase.ListRightPush(juljulCommandQueueWaitToSend, redisValue);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                if (errorCallback != null) errorCallback(ex);
-            }
-        }
 
         public void PublishDataModel<T>(DistributedCommandDataModel<T> cmd, Action<Exception> errorCallback = null)
             where T : class, IDataModel
@@ -192,58 +190,64 @@ namespace RedisMicroservices.Core.Distributed
         {
             try
             {
-                var redisChannel = typeof (T).FullName;
-
+                var redisChannel = typeof(T).FullName;
                 RedisServices.RedisSubscriber.Subscribe(redisChannel, (channel, value) =>
                 {
-                    var cmd = JsonConvert.DeserializeObject<DistributedCommand<T>>(value);
                     try
                     {
+                        var cmd = JsonConvert.DeserializeObject<DistributedCommand<T>>(value);
+
                         LogPendding<T>(cmd.Id, value);
-                        var dataKeyStored = cmd.DataBehavior + redisChannel;
-                        bool isDone = false;
-                        switch (cmd.DataBehavior)
+
+                        TaskTryRun<T>(cmd.Id, value, () =>
                         {
-                            case DataBehavior.Queue:
-                                var qv = RedisServices.RedisDatabase.ListLeftPop(dataKeyStored);
-                                if (qv.HasValue)
-                                {
-                                    var data = JsonConvert.DeserializeObject<DistributedCommand<T>>(qv);
-                                    callBack(redisChannel, data);
-                                    isDone = true;
-                                }
-                                break;
-                            case DataBehavior.Stack:
-                                var sv = RedisServices.RedisDatabase.ListRightPop(dataKeyStored);
-                                if (sv.HasValue)
-                                {
-                                    var data = JsonConvert.DeserializeObject<DistributedCommand<T>>(sv);
-                                    callBack(redisChannel, data);
-                                    isDone = true;
-                                }
-                                break;
-                            case DataBehavior.PubSub:
-                                var da = RedisServices.RedisDatabase.HashGet(dataKeyStored,
-                                    cmd.Id.ToString());
-                                if (da.HasValue)
-                                {
-                                    var data = JsonConvert.DeserializeObject<DistributedCommand<T>>(da);
-                                    callBack(redisChannel, data);
-                                    isDone = true;
-                                }
-                                break;
-                        }
-                        if (isDone)
-                        {
+                            var isDone = false;
+                            switch (cmd.DataBehavior)
+                            {
+                                case DataBehavior.Queue:
+                                    while (true)
+                                    {
+                                        var qv = RedisServices.RedisDatabase.ListLeftPop(cmd.DataBehavior + redisChannel);
+                                        if (!qv.HasValue) break;
+
+                                        var data = JsonConvert.DeserializeObject<DistributedCommand<T>>(qv);
+                                        callBack(redisChannel, data);
+                                        isDone = true;
+                                    }
+
+                                    break;
+                                case DataBehavior.Stack:
+                                    while (true)
+                                    {
+                                        var sv =
+                                            RedisServices.RedisDatabase.ListRightPop(cmd.DataBehavior + redisChannel);
+                                        if (!sv.HasValue) break;
+
+                                        var data = JsonConvert.DeserializeObject<DistributedCommand<T>>(sv);
+                                        callBack(redisChannel, data);
+                                        isDone = true;
+                                    }
+
+                                    break;
+                                case DataBehavior.PubSub:
+                                    var da = RedisServices.RedisDatabase.HashGet(cmd.DataBehavior + redisChannel,
+                                        cmd.Id.ToString());
+                                    if (da.HasValue)
+                                    {
+                                        var data = JsonConvert.DeserializeObject<DistributedCommand<T>>(da);
+                                        callBack(redisChannel, data);
+                                        isDone = true;
+                                    }
+                                    break;
+                            }
+                            if (!isDone) return;
+
                             LogSuccess<T>(cmd.Id, cmd.ToJson());
                             Console.WriteLine("Done:" + value);
-                        }
+                        }, errorCallback);
                     }
                     catch (Exception ex)
                     {
-                        var redisValue = cmd.ToJson();
-                        LogError<T>(cmd.Id, redisValue);
-                      
                         Console.WriteLine(ex);
                         if (errorCallback != null) errorCallback(ex);
                     }
@@ -264,53 +268,61 @@ namespace RedisMicroservices.Core.Distributed
                 var redisChannel = typeof (T).FullName;
                 RedisServices.RedisSubscriber.Subscribe(redisChannel, (channel, value) =>
                 {
-                    var cmd = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(value);
                     try
                     {
+                        var cmd = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(value);
+
                         LogPendding<T>(cmd.Id, value);
-                        bool isDone = false;
-                        switch (cmd.DataBehavior)
+
+                        TaskTryRun<T>(cmd.Id, value, () =>
                         {
-                            case DataBehavior.Queue:
-                                var qv = RedisServices.RedisDatabase.ListLeftPop(cmd.DataBehavior + redisChannel);
-                                if (qv.HasValue)
-                                {
-                                    var data = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(qv);
-                                    callBack(redisChannel, data);
-                                    isDone = true;
-                                }
-                                break;
-                            case DataBehavior.Stack:
-                                var sv = RedisServices.RedisDatabase.ListRightPop(cmd.DataBehavior + redisChannel);
-                                if (sv.HasValue)
-                                {
-                                    var data = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(sv);
-                                    callBack(redisChannel, data);
-                                    isDone = true;
-                                }
-                                break;
-                            case DataBehavior.PubSub:
-                                var da = RedisServices.RedisDatabase.HashGet(cmd.DataBehavior + redisChannel,
-                                    cmd.Id.ToString());
-                                if (da.HasValue)
-                                {
-                                    var data = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(da);
-                                    callBack(redisChannel, data);
-                                    isDone = true;
-                                }
-                                break;
-                        }
-                        if (isDone)
-                        {
+                            var isDone = false;
+                            switch (cmd.DataBehavior)
+                            {
+                                case DataBehavior.Queue:
+                                    while (true)
+                                    {
+                                        var qv = RedisServices.RedisDatabase.ListLeftPop(cmd.DataBehavior + redisChannel);
+                                        if (!qv.HasValue) break;
+
+                                        var data = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(qv);
+                                        callBack(redisChannel, data);
+                                        isDone = true;
+                                    }
+
+                                    break;
+                                case DataBehavior.Stack:
+                                    while (true)
+                                    {
+                                        var sv =
+                                            RedisServices.RedisDatabase.ListRightPop(cmd.DataBehavior + redisChannel);
+                                        if (!sv.HasValue) break;
+
+                                        var data = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(sv);
+                                        callBack(redisChannel, data);
+                                        isDone = true;
+                                    }
+
+                                    break;
+                                case DataBehavior.PubSub:
+                                    var da = RedisServices.RedisDatabase.HashGet(cmd.DataBehavior + redisChannel,
+                                        cmd.Id.ToString());
+                                    if (da.HasValue)
+                                    {
+                                        var data = JsonConvert.DeserializeObject<DistributedCommandEntity<T>>(da);
+                                        callBack(redisChannel, data);
+                                        isDone = true;
+                                    }
+                                    break;
+                            }
+                            if (!isDone) return;
+
                             LogSuccess<T>(cmd.Id, cmd.ToJson());
                             Console.WriteLine("Done:" + value);
-                        }
+                        }, errorCallback);
                     }
                     catch (Exception ex)
                     {
-                        var redisValue = cmd.ToJson();
-                        LogError<T>(cmd.Id, redisValue);
-                      
                         Console.WriteLine(ex);
                         if (errorCallback != null) errorCallback(ex);
                     }
@@ -329,59 +341,64 @@ namespace RedisMicroservices.Core.Distributed
         {
             try
             {
-                var redisChannel = typeof (T).FullName;
-
+                var redisChannel = typeof(T).FullName;
                 RedisServices.RedisSubscriber.Subscribe(redisChannel, (channel, value) =>
                 {
-                    var cmd = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(value);
                     try
                     {
+                        var cmd = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(value);
+
                         LogPendding<T>(cmd.Id, value);
 
-                        bool isDone = false;
-                        switch (cmd.DataBehavior)
+                        TaskTryRun<T>(cmd.Id, value, () =>
                         {
-                            case DataBehavior.Queue:
-                                var qv = RedisServices.RedisDatabase.ListLeftPop(cmd.DataBehavior + redisChannel);
-                                if (qv.HasValue)
-                                {
-                                    var data = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(qv);
-                                    callBack(redisChannel, data);
-                                    isDone = true;
-                                }
-                                break;
-                            case DataBehavior.Stack:
-                                var sv = RedisServices.RedisDatabase.ListRightPop(cmd.DataBehavior + redisChannel);
-                                if (sv.HasValue)
-                                {
-                                    var data = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(sv);
-                                    callBack(redisChannel, data);
-                                    isDone = true;
-                                }
-                                break;
-                            case DataBehavior.PubSub:
+                            var isDone = false;
+                            switch (cmd.DataBehavior)
+                            {
+                                case DataBehavior.Queue:
+                                    while (true)
+                                    {
+                                        var qv = RedisServices.RedisDatabase.ListLeftPop(cmd.DataBehavior + redisChannel);
+                                        if (!qv.HasValue) break;
 
-                                var da = RedisServices.RedisDatabase.HashGet(cmd.DataBehavior + redisChannel,
-                                    cmd.Id.ToString());
-                                if (da.HasValue)
-                                {
-                                    var data = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(da);
-                                    callBack(redisChannel, data);
-                                    isDone = true;
-                                }
-                                break;
-                        }
-                        if (isDone)
-                        {
+                                        var data = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(qv);
+                                        callBack(redisChannel, data);
+                                        isDone = true;
+                                    }
+
+                                    break;
+                                case DataBehavior.Stack:
+                                    while (true)
+                                    {
+                                        var sv =
+                                            RedisServices.RedisDatabase.ListRightPop(cmd.DataBehavior + redisChannel);
+                                        if (!sv.HasValue) break;
+
+                                        var data = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(sv);
+                                        callBack(redisChannel, data);
+                                        isDone = true;
+                                    }
+
+                                    break;
+                                case DataBehavior.PubSub:
+                                    var da = RedisServices.RedisDatabase.HashGet(cmd.DataBehavior + redisChannel,
+                                        cmd.Id.ToString());
+                                    if (da.HasValue)
+                                    {
+                                        var data = JsonConvert.DeserializeObject<DistributedCommandDataModel<T>>(da);
+                                        callBack(redisChannel, data);
+                                        isDone = true;
+                                    }
+                                    break;
+                            }
+                            if (!isDone) return;
+
                             LogSuccess<T>(cmd.Id, cmd.ToJson());
                             Console.WriteLine("Done:" + value);
-                        }
+                        }, errorCallback);
                     }
                     catch (Exception ex)
                     {
-                        var redisValue = cmd.ToJson();
-                        LogError<T>(cmd.Id, redisValue);
-                   
                         Console.WriteLine(ex);
                         if (errorCallback != null) errorCallback(ex);
                     }
@@ -420,6 +437,24 @@ namespace RedisMicroservices.Core.Distributed
             {
                 RedisServices.RedisDatabase.HashDelete(juljulCommandLogError, cmdid);
             }
+        }
+
+        void TaskTryRun<T>(Guid cmdId, string cmdJson, Action a, Action<Exception> error) where T : class
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    a();
+                }
+                catch (Exception ex)
+                {
+                    LogError<T>(cmdId, cmdJson);
+
+                    if (error != null) error(ex);
+                    Console.WriteLine(ex);
+                }
+            });
         }
 
         //void TryCatchLog(Action a)

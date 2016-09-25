@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
+using Newtonsoft.Json;
 using RedisMicroservices.Core.Distributed;
 using RedisMicroservices.Core.Repository;
 using RedisMicroservices.DataAccess.Ef6;
@@ -52,6 +53,7 @@ namespace RedisMicroservices.Repository
                 switch (v.EntityAction)
                 {
                     case EntityAction.Insert:
+
                         Insert(v.Data);
                         break;
                     case EntityAction.Update:
