@@ -42,8 +42,8 @@ namespace RedisMicroservices.UnitTest
 
         public PushCommandTest()
         {
-            RepositoryEngine.Boot();
-            ServicesEngine.Boot();
+            //RepositoryEngine.Boot();
+            //ServicesEngine.Boot();
         }
 
         [TestMethod]
@@ -61,12 +61,32 @@ namespace RedisMicroservices.UnitTest
                 sampleData, EntityAction.Insert));
 
             Console.WriteLine(sampleData.Id);
-
-            Thread.Sleep(2000);
+            
         }
 
         [TestMethod]
-        public void Aaa()
+        public void TestPedingInsert()
+        {
+            List<SampleData> xxx=new List<SampleData>();
+
+            for (int i = 0; i < 100; i++)
+            {
+                xxx.Add(new SampleData()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = i.ToString()
+                });
+            }
+            var dc = new DistributedServices();
+
+            foreach (var x in xxx)
+            {
+                dc.PublishDataModel(new DistributedCommandDataModel<SampleData>(x,EntityAction.Insert));
+            }
+        }
+
+        [TestMethod]
+        public void MadInsert()
         {
             while (true)
             {
