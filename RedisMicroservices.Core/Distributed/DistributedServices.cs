@@ -27,6 +27,8 @@ namespace RedisMicroservices.Core.Distributed
 
         const string juljulCommandQueueWaitToSend = "juljul_command_queue_wait_to_send";
 
+        const string juljulLock = "juljul_lock";
+
         static DistributedServices()
         {
             TryDequeueToPublishCmd();
@@ -105,6 +107,12 @@ namespace RedisMicroservices.Core.Distributed
                 {
                     try
                     {
+                        var lck = RedisServices.RedisDatabase.StringGet(juljulLock);
+                        if (lck.HasValue && (bool) lck) continue;
+
+                        RedisServices.RedisDatabase.StringSet(juljulLock, true);
+                        RedisServices.RedisDatabase.KeyExpire(juljulLock, new TimeSpan(0, 0, 1, 0));
+
                         var allCmdPushed =
                             RedisServices.RedisDatabase.HashGetAll(juljulCommandLogPushed).ToList();
 
@@ -122,6 +130,8 @@ namespace RedisMicroservices.Core.Distributed
                         }
 
                         allCmdPushed.Clear();
+
+                        RedisServices.RedisDatabase.KeyDelete(juljulLock);
                     }
                     catch (Exception ex)
                     {
