@@ -21,8 +21,8 @@ namespace RedisMicroservices.Services
 
         public static void Boot()
         {
-            LangguageServices.ResiterDistributed(DistributedServices);
-            SampleDataServices.ResiterDistributed(DistributedServices);
+            LangguageServices.RegisterDistributed(DistributedServices);
+            SampleDataServices.RegisterDistributed(DistributedServices);
         }
 
     }

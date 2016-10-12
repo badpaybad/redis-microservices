@@ -8,7 +8,7 @@ namespace RedisMicroservices.Services
     public   class LangguageServices : ILangguageServices
     {
         private IDistributedServices _distributedServices;
-        public void ResiterDistributed(IDistributedServices distributedServices)
+        public void RegisterDistributed(IDistributedServices distributedServices)
         {
             _distributedServices = distributedServices;
         }

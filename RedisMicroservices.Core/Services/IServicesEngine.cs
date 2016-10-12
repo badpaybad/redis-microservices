@@ -7,7 +7,7 @@ namespace RedisMicroservices.Core.Services
 {
     public interface IServicesEngine<T> where T : IDataModel
     {
-        void ResiterDistributed(IDistributedServices distributedServices);
+        void RegisterDistributed(IDistributedServices distributedServices);
      
     }
 }

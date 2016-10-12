@@ -19,7 +19,7 @@ namespace RedisMicroservices.Services
             _langguageServices = langguageServices;
         }
 
-        public void ResiterDistributed(IDistributedServices distributedServices)
+        public void RegisterDistributed(IDistributedServices distributedServices)
         {
             _distributedServices = distributedServices;
             distributedServices.SubscribeDataModel<SampleData>(((c, v) =>

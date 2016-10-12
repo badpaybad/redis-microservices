@@ -127,5 +127,15 @@ namespace RedisMicroservices.UnitTest
                 Thread.Sleep(1000);
             }
         }
+
+        [TestMethod]
+        public void TaskRun()
+        {
+
+            Task.Run(() =>
+            {
+                throw new Exception("lol");
+            });
+        }
     }
 }
