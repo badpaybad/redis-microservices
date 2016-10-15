@@ -113,8 +113,9 @@ namespace RedisMicroservices.Core.Distributed
                         RedisServices.RedisDatabase.StringSet(juljulLock, true);
                         RedisServices.RedisDatabase.KeyExpire(juljulLock, new TimeSpan(0, 0, 1, 0));
 
+                        //todo: when huge amount command pushed. we will be re-thinking
                         var allCmdPushed =
-                            RedisServices.RedisDatabase.HashGetAll(juljulCommandLogPushed).ToList();
+                            RedisServices.RedisDatabase.HashGetAll(juljulCommandLogPushed);
 
                         foreach (var cmdP in allCmdPushed)
                         {
@@ -129,7 +130,7 @@ namespace RedisMicroservices.Core.Distributed
                             Console.WriteLine("--repush cmd: "+cmdP.Name+" --data: " + redisValue);
                         }
 
-                        allCmdPushed.Clear();
+                        allCmdPushed=null;
 
                         RedisServices.RedisDatabase.KeyDelete(juljulLock);
                     }

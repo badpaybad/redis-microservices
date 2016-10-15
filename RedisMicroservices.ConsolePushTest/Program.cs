@@ -23,8 +23,8 @@ namespace RedisMicroservices.ConsolePushTest
             var sampleData = new SampleData()
             {
                 Id=Guid.NewGuid(),
-                Name = "",
-                Version = ""
+                Name ="Name: "+ DateTime.Now,
+                Version = "Version:"+DateTime.Now
             };
             ds.PublishDataModel(new DistributedCommandDataModel<SampleData>(sampleData, EntityAction.Insert));
             Console.WriteLine(sampleData.Id);
